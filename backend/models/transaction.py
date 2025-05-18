@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from .base import Base
 
 class Transaction(Base):
@@ -8,3 +8,4 @@ class Transaction(Base):
     contractor = Column(String(100))
     amount = Column(Float)
     status = Column(String(20))
+    user_id = Column(Integer, ForeignKey("users.id"))
