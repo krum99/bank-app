@@ -3,6 +3,8 @@ from database import engine
 from models.base import Base
 from auth_routes import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
+from models import transaction
+
 
 app = FastAPI()
 

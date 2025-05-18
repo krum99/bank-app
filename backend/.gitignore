@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Node / Vue
+ui/node_modules/
+ui/dist/
+
+# Docker volumes
+db-data/
+
+# env setup
+backend/.env
