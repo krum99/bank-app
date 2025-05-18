@@ -1,7 +1,15 @@
 <template>
   <div class="container py-5">
     <h1 class="text-center mb-4">Welcome</h1>
-    <div class="d-flex flex-column flex-md-row justify-content-center gap-4">
+
+    <!-- Logged -->
+    <div v-if="isLoggedIn" class="text-center">
+      <h3>Logged in as user #{{ currentUserId }}</h3>
+      <button @click="logout" class="btn btn-outline-danger mt-3">Logout</button>
+    </div>
+
+    <!-- NOT Logged -->
+    <div v-else class="d-flex flex-column flex-md-row justify-content-center gap-4">
       
       <!-- Register Form -->
       <form @submit.prevent="register" class="card p-4 w-100" style="max-width: 400px;">
@@ -32,27 +40,55 @@ export default {
       registerData: { username: '', password: '' },
       loginData: { username: '', password: '' },
       registerMessage: '',
-      loginMessage: ''
+      loginMessage: '',
+      isLoggedIn: false,
+      currentUserId: null
     };
+  },
+  mounted() {
+    const storedUser = localStorage.getItem("user_id");
+    if (storedUser) {
+      this.isLoggedIn = true;
+      this.currentUserId = storedUser;
+    }
   },
   methods: {
     async register() {
-      const response = await fetch('http://localhost:8000/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.registerData)
-      });
-      const result = await response.json();
-      this.registerMessage = result.message || result.detail;
+      try {
+        const response = await fetch('http://localhost:8000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(this.registerData)
+        });
+        const result = await response.json();
+        this.registerMessage = result.message || result.detail;
+      } catch (error) {
+        this.registerMessage = "Registration failed.";
+      }
     },
     async login() {
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.loginData)
-      });
-      const result = await response.json();
-      this.loginMessage = result.message || result.detail;
+      try {
+        const response = await fetch('http://localhost:8000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(this.loginData)
+        });
+        const result = await response.json();
+        if (response.ok) {
+          localStorage.setItem("user_id", result.user_id);
+          this.isLoggedIn = true;
+          this.currentUserId = result.user_id;
+        } else {
+          this.loginMessage = result.detail || "Login failed.";
+        }
+      } catch (error) {
+        this.loginMessage = "Login failed.";
+      }
+    },
+    logout() {
+      localStorage.removeItem("user_id");
+      this.isLoggedIn = false;
+      this.currentUserId = null;
     }
   }
 };
